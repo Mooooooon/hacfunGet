@@ -68,6 +68,6 @@ while True:
                             fileHandle.close()
             print '串号' + number + '下载完毕，按回车关闭程序，或输入串号继续下载'
         else:
-            print
+            print '获取失败，请确认串号输入正确'
     else:
         break
