@@ -44,6 +44,7 @@ while True:
         if success == True:
             size = info[u("page")][u("size")]
             img_sum = 1
+            error = 0
             isExists = os.path.exists(str(number))
             if not isExists:
                 os.makedirs(str(number))
@@ -52,20 +53,28 @@ while True:
                 get_json = start(url)
                 info = json.loads(get_json)
                 replys = info[u("replys")]
+                fileHandle = open(str(number) + "/" + 'error.txt', 'a')
                 for j in range(len(replys)):
                     image = replys[j][u("image")]
                     if image:
-                        image_url = "http://acimg.qiniudn.com/h" + image
-                        ext = image.split('.')[-1]
+                        image_url = "http://static.acfun.mm111.net/h" + image
+                        image_url_split = image.split('.')
+                        ext = image_url_split[-1]
+                        file_name = image_url_split[-2].split('/')[-1]
                         try:
-                            urllib.urlretrieve(image_url, str(number) + "/" + str(img_sum) + "." + ext)
+                            urllib.urlretrieve(image_url, str(number) + "/" + file_name + "." + ext)
                             print "第" + str(img_sum) + "张下载完毕"
                             img_sum += 1
+                            error = 0
                         except:
-                            print "第" + str(img_sum) + "张下载失败，忽略"
-                            fileHandle = open(str(number) + "/" + 'error.txt', 'a')
-                            fileHandle.write(image_url + "\n")
-                            fileHandle.close()
+                            error += 1
+                            if error < 5:
+                                print "第" + str(img_sum) + "张下载失败，重试"
+                                img_sum -= 1
+                            else:
+                                print "第" + str(img_sum) + "张下载失败，放弃"
+                                fileHandle.write(image_url + "\n")
+                fileHandle.close()
             print '串号' + number + '下载完毕，按回车关闭程序，或输入串号继续下载'
         else:
             print '获取失败，请确认串号输入正确'
